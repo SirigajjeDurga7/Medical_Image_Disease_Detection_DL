@@ -121,5 +121,5 @@ if uploaded_file is not None:
 st.divider()
 
 st.caption(
-    "Deep Learning Assignment 2 | AI-Powered Medical Image Disease Detection"
+    "Deep Learning | AI-Powered Medical Image Disease Detection"
 )
