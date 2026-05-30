@@ -2,6 +2,8 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+import zipfile
+import os
 
 # -------------------------------
 # PAGE CONFIG
@@ -12,6 +14,14 @@ st.set_page_config(
     page_icon="🩺",
     layout="centered"
 )
+
+# -------------------------------
+# EXTRACT MODEL FROM ZIP
+# -------------------------------
+
+if not os.path.exists("pneumonia_cnn_model.h5"):
+    with zipfile.ZipFile("pneumonia_model.zip", "r") as zip_ref:
+        zip_ref.extractall()
 
 # -------------------------------
 # LOAD MODEL
@@ -39,7 +49,7 @@ This application uses a Convolutional Neural Network (CNN) to analyze Chest X-Ra
 ✅ Automatic Image Preprocessing  
 ✅ AI-Based Disease Detection  
 ✅ Prediction Confidence Score  
-✅ Real-Time Medical Image Analysis
+✅ Real-Time Medical Image Analysis  
 
 ### Disease Classes
 - NORMAL
@@ -67,43 +77,36 @@ if uploaded_file is not None:
 
     st.image(
         image,
-        caption="Uploaded X-Ray Image",
+        caption="Uploaded Chest X-Ray",
         use_container_width=True
     )
 
-    # Preprocess image
     img = image.resize((224, 224))
 
-    img_array = np.array(img)
-
-    img_array = img_array / 255.0
+    img_array = np.array(img) / 255.0
 
     img_array = np.expand_dims(img_array, axis=0)
 
-    # Predict
     prediction = model.predict(img_array, verbose=0)
 
     probability = float(prediction[0][0])
 
     st.divider()
 
-    st.subheader("Prediction Result")
+    st.subheader("🩺 Prediction Result")
 
     if probability >= 0.5:
-
         st.error(
             f"⚠️ Pneumonia Detected\n\nConfidence: {probability*100:.2f}%"
         )
-
     else:
-
         st.success(
             f"✅ Normal Lungs Detected\n\nConfidence: {(1-probability)*100:.2f}%"
         )
 
     st.divider()
 
-    st.subheader("Model Information")
+    st.subheader("📊 Model Performance")
 
     col1, col2, col3 = st.columns(3)
 
@@ -112,12 +115,11 @@ if uploaded_file is not None:
     col3.metric("Recall", "93%")
 
     st.info(
-        "This CNN model was trained on Chest X-Ray images "
-        "to classify NORMAL and PNEUMONIA cases."
+        "The CNN model was trained using Chest X-Ray images to classify NORMAL and PNEUMONIA cases."
     )
 
 st.divider()
 
 st.caption(
-    "Deep Learning Assignment - AI-Powered Medical Image Disease Detection"
+    "Deep Learning Assignment 2 | AI-Powered Medical Image Disease Detection"
 )
